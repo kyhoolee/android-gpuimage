@@ -117,12 +117,19 @@ public class GPUImageTwoInputFilter extends GPUImageFilter {
     @Override
     protected void onDrawArraysPre() {
         GLES20.glEnableVertexAttribArray(filterSecondTextureCoordinateAttribute);
+
         GLES20.glActiveTexture(GLES20.GL_TEXTURE3);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, filterSourceTexture2);
+
         GLES20.glUniform1i(filterInputTextureUniform2, 3);
 
         texture2CoordinatesBuffer.position(0);
-        GLES20.glVertexAttribPointer(filterSecondTextureCoordinateAttribute, 2, GLES20.GL_FLOAT, false, 0, texture2CoordinatesBuffer);
+        GLES20.glVertexAttribPointer(
+                filterSecondTextureCoordinateAttribute,
+                2, GLES20.GL_FLOAT, false, 0,
+                texture2CoordinatesBuffer);
+
+
     }
 
     public void setRotation(final Rotation rotation, final boolean flipHorizontal, final boolean flipVertical) {

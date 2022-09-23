@@ -30,6 +30,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -82,9 +83,11 @@ public class GPUImageView extends FrameLayout {
         }
         gpuImage = new GPUImage(context);
         if (surfaceType == SURFACE_TYPE_TEXTURE_VIEW) {
+            Log.e("GPUView", "SURFACE_TYPE_TEXTURE_VIEW");
             surfaceView = new GPUImageGLTextureView(context, attrs);
             gpuImage.setGLTextureView((GLTextureView) surfaceView);
         } else {
+            Log.e("GPUView", "SURFACE_TYPE_surface_VIEW");
             surfaceView = new GPUImageGLSurfaceView(context, attrs);
             gpuImage.setGLSurfaceView((GLSurfaceView) surfaceView);
         }

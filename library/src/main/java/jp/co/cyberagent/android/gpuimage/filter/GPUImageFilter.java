@@ -27,7 +27,7 @@ import java.util.LinkedList;
 
 import jp.co.cyberagent.android.gpuimage.util.OpenGlUtils;
 
-public class GPUImageFilter {
+public class  GPUImageFilter {
     public static final String NO_FILTER_VERTEX_SHADER = "" +
             "attribute vec4 position;\n" +
             "attribute vec4 inputTextureCoordinate;\n" +
@@ -112,19 +112,26 @@ public class GPUImageFilter {
             return;
         }
 
+
         cubeBuffer.position(0);
         GLES20.glVertexAttribPointer(glAttribPosition, 2, GLES20.GL_FLOAT, false, 0, cubeBuffer);
         GLES20.glEnableVertexAttribArray(glAttribPosition);
+
+
         textureBuffer.position(0);
         GLES20.glVertexAttribPointer(glAttribTextureCoordinate, 2, GLES20.GL_FLOAT, false, 0,
                 textureBuffer);
         GLES20.glEnableVertexAttribArray(glAttribTextureCoordinate);
+
+
         if (textureId != OpenGlUtils.NO_TEXTURE) {
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
             GLES20.glUniform1i(glUniformTexture, 0);
         }
+
         onDrawArraysPre();
+
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
         GLES20.glDisableVertexAttribArray(glAttribPosition);
         GLES20.glDisableVertexAttribArray(glAttribTextureCoordinate);

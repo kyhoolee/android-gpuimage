@@ -341,6 +341,15 @@ public class GPUImage {
      * @return the bitmap with filter applied
      */
     public Bitmap getBitmapWithFilterApplied(final Bitmap bitmap) {
+//        GPUImageRenderer renderer = new GPUImageRenderer(filter);
+////        renderer.setRotation(Rotation.NORMAL,
+////                this.renderer.isFlippedHorizontally(), this.renderer.isFlippedVertically());
+////        renderer.setScaleType(scaleType);
+//        PixelBuffer buffer = new PixelBuffer(bitmap.getWidth(), bitmap.getHeight());
+//        buffer.setRenderer(renderer);
+//        renderer.setImageBitmap(bitmap, false);
+//        Bitmap result = buffer.getBitmap();
+//        return result;
         return getBitmapWithFilterApplied(bitmap, false);
     }
 

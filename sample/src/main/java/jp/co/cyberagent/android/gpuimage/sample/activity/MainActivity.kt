@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         findViewById<View>(R.id.button_gallery).setOnClickListener {
-            startActivity(Intent(this, GalleryActivity::class.java))
+            startActivity(Intent(this, FaceSwapActivity::class.java))
         }
         findViewById<View>(R.id.button_camera).setOnClickListener {
             if (!hasCameraPermission() || !hasStoragePermission()) {
