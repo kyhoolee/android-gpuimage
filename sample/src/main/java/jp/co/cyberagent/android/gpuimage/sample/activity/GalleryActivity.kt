@@ -18,6 +18,7 @@ package jp.co.cyberagent.android.gpuimage.sample.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -29,19 +30,30 @@ import jp.co.cyberagent.android.gpuimage.sample.GPUImageFilterTools
 import jp.co.cyberagent.android.gpuimage.sample.GPUImageFilterTools.FilterAdjuster
 import jp.co.cyberagent.android.gpuimage.sample.R
 
+/**
+ * 1. Static image editing with OpenGL starts here
+ */
 class GalleryActivity : AppCompatActivity() {
 
+    // 1. Some filters have config to adjust
     private var filterAdjuster: FilterAdjuster? = null
+
+    // 2. Main OpenGL-based imageview - for showing image and applied OpenGL-based filters
     private val gpuImageView: GPUImageView by lazy { findViewById<GPUImageView>(R.id.gpuimage) }
+
+    // 3. Seekbar to adjust filter config values
     private val seekBar: SeekBar by lazy { findViewById<SeekBar>(R.id.seekBar) }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gallery)
 
+        // 1.1 Initialize seekBar
         seekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                Log.i("GalleryOpenGL", "Adjust filter with new value: $progress")
                 filterAdjuster?.adjust(progress)
+                // Request openGL-view re-render with new config
                 gpuImageView.requestRender()
             }
 
@@ -49,14 +61,25 @@ class GalleryActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
+        // 1.2. Initialize filter choices
         findViewById<View>(R.id.button_choose_filter).setOnClickListener {
+            Log.i("GalleryOpenGL", "Show filter list")
             GPUImageFilterTools.showDialog(this) { filter ->
+                Log.i("GalleryOpenGL", "Click on filter: $filter")
+                // Switch to new filter
                 switchFilterTo(filter)
+                // Request openGL re-render with new filter
                 gpuImageView.requestRender()
             }
         }
-        findViewById<View>(R.id.button_save).setOnClickListener { saveImage() }
 
+        // 1.3. Initialize saving button
+        findViewById<View>(R.id.button_save).setOnClickListener {
+            Log.i("GalleryOpenGL", "Save image from openGL-based view")
+            saveImage()
+        }
+
+        // 1.4. Start photo-picker
         startPhotoPicker()
     }
 
@@ -87,7 +110,10 @@ class GalleryActivity : AppCompatActivity() {
 
     private fun switchFilterTo(filter: GPUImageFilter) {
         if (gpuImageView.filter == null || gpuImageView.filter.javaClass != filter.javaClass) {
+            // 1. Set new filter to openGL-based view's filter
             gpuImageView.filter = filter
+
+            // 2. Update new filter adjuster and seekbar if needed
             filterAdjuster = FilterAdjuster(filter)
             if (filterAdjuster!!.canAdjust()) {
                 seekBar.visibility = View.VISIBLE

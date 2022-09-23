@@ -122,10 +122,15 @@ object GPUImageFilterTools {
             addFilter("Vibrance", FilterType.VIBRANCE)
         }
 
+        // 1. Using Alert-Dialog for showing list of filter
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Choose a filter")
         builder.setItems(filters.names.toTypedArray()) { _, item ->
-            listener(createFilterForType(context, filters.filters[item]))
+            // 2. Pass filter object to listener - which running on caller-GalleryActivity
+            listener(
+                // 3. Init filter object from filter-type
+                createFilterForType(context, filters.filters[item])
+            )
         }
         builder.create().show()
     }

@@ -7,8 +7,6 @@ android {
         minSdkVersion MIN_SDK_VERSION as int
         targetSdkVersion TARGET_SDK_VERSION as int
 
-        versionCode = VERSION_CODE as int
-        versionName = VERSION_NAME
         ndk.abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
         externalNativeBuild {
             cmake { cppFlags "" }
@@ -19,11 +17,7 @@ android {
     }
 
     buildTypes {
-        debug {
-            debuggable true
-        }
         release {
-            debuggable false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

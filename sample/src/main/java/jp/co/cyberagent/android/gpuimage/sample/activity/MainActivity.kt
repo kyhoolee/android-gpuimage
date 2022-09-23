@@ -20,21 +20,29 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import jp.co.cyberagent.android.gpuimage.sample.R
 
+/**
+ * Everything is starting here
+ * 0. The main activity
+ */
 class MainActivity : AppCompatActivity() {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // 0.1. Choose image from gallery
         findViewById<View>(R.id.button_gallery).setOnClickListener {
+            Log.i("OpenGL-tut", "0.1. Select image from gallery")
             startActivity(Intent(this, GalleryActivity::class.java))
         }
+        // 0.2. Take image from camera
         findViewById<View>(R.id.button_camera).setOnClickListener {
             if (!hasCameraPermission() || !hasStoragePermission()) {
                 ActivityCompat.requestPermissions(
@@ -43,6 +51,7 @@ class MainActivity : AppCompatActivity() {
                     REQUEST_CAMERA
                 )
             } else {
+                Log.i("OpenGL-tut", "0.2. Select image from camera")
                 startActivity(Intent(this, CameraActivity::class.java))
             }
         }

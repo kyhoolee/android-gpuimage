@@ -49,24 +49,39 @@ import jp.co.cyberagent.android.gpuimage.filter.GPUImageFilter;
 import jp.co.cyberagent.android.gpuimage.util.Rotation;
 
 /**
- * The main accessor for GPUImage functionality. This class helps to do common
- * tasks through a simple interface.
+ * The main accessor for GPUImage functionality.
+ * This class helps to do common tasks through a simple interface.
  */
 public class GPUImage {
 
+    // 0. static Scale-type
     public enum ScaleType {CENTER_INSIDE, CENTER_CROP}
 
+    // 0. static Surface-type
     static final int SURFACE_TYPE_SURFACE_VIEW = 0;
     static final int SURFACE_TYPE_TEXTURE_VIEW = 1;
 
+    // 3. Context
     private final Context context;
+
+    // 4. OpenGL renderer
     private final GPUImageRenderer renderer;
+
+    // 5. OpenGL SurfaceView and default surfaceType
     private int surfaceType = SURFACE_TYPE_SURFACE_VIEW;
     private GLSurfaceView glSurfaceView;
     private GLTextureView glTextureView;
+
+    // 6. OpenGL-based filter
     private GPUImageFilter filter;
+
+    // 7. Current bitmap
     private Bitmap currentBitmap;
+
+    // 8. Current Scale-type
     private ScaleType scaleType = ScaleType.CENTER_CROP;
+
+    // 9. Current scale width and height
     private int scaleWidth, scaleHeight;
 
     /**
@@ -79,8 +94,11 @@ public class GPUImage {
             throw new IllegalStateException("OpenGL ES 2.0 is not supported on this phone.");
         }
 
+        // 1. android context
         this.context = context;
+        // 2. OpenGL filter
         filter = new GPUImageFilter();
+        // 3. OpenGL renderer
         renderer = new GPUImageRenderer(filter);
     }
 
@@ -104,11 +122,18 @@ public class GPUImage {
      * @param view the GLSurfaceView
      */
     public void setGLSurfaceView(final GLSurfaceView view) {
+        // 1. Setup surface-type and surfaceView
         surfaceType = SURFACE_TYPE_SURFACE_VIEW;
         glSurfaceView = view;
+
+        // 2. SurfaceView set config
+        // 2.1. Set openGL 2.0
         glSurfaceView.setEGLContextClientVersion(2);
+        // 2.2. Set Config chooser
         glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+        // 2.3. Set pixel format of the surface
         glSurfaceView.getHolder().setFormat(PixelFormat.RGBA_8888);
+        // 2.4. Set renderer
         glSurfaceView.setRenderer(renderer);
         glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         glSurfaceView.requestRender();
@@ -120,13 +145,21 @@ public class GPUImage {
      * @param view the GLTextureView
      */
     public void setGLTextureView(final GLTextureView view) {
+        // 1. Set surface-type and surfaceView
         surfaceType = SURFACE_TYPE_TEXTURE_VIEW;
         glTextureView = view;
+
+        // 2. Set openGL 2.0
         glTextureView.setEGLContextClientVersion(2);
+        // 3. Set config chooser
         glTextureView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+        // 4. Set opaque false
         glTextureView.setOpaque(false);
+        // 5. Set renderer
         glTextureView.setRenderer(renderer);
+        // 6. Set render mode - when there is change
         glTextureView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        // 7. Request render
         glTextureView.requestRender();
     }
 
@@ -352,6 +385,7 @@ public class GPUImage {
      * @return the bitmap with filter applied
      */
     public Bitmap getBitmapWithFilterApplied(final Bitmap bitmap, boolean recycle) {
+        // 1. Renderer delete image and delete filter
         if (glSurfaceView != null || glTextureView != null) {
             renderer.deleteImage();
             renderer.runOnDraw(new Runnable() {
@@ -374,24 +408,45 @@ public class GPUImage {
             }
         }
 
+        // 2. Create local renderer with filter
         GPUImageRenderer renderer = new GPUImageRenderer(filter);
+
+        // 2.1. Set rotation + scaleType for local renderer
         renderer.setRotation(Rotation.NORMAL,
                 this.renderer.isFlippedHorizontally(), this.renderer.isFlippedVertically());
+
         renderer.setScaleType(scaleType);
+
+        // 2.2. Create pixelBuffer
         PixelBuffer buffer = new PixelBuffer(bitmap.getWidth(), bitmap.getHeight());
+
+        // 2.3. set local renderer to pixel-buffer
         buffer.setRenderer(renderer);
+
+        // 2.4. Set bitmap to renderer
         renderer.setImageBitmap(bitmap, recycle);
+
+        // 2.5. Get bitmap result from pixel-buffer
         Bitmap result = buffer.getBitmap();
+
+        // 2.6. Destroy filter, local renderer , pixel-buffer
         filter.destroy();
+
         renderer.deleteImage();
+
         buffer.destroy();
 
+        // 3. Set filter to renderer
         this.renderer.setFilter(filter);
+
+        // set currentBitmap to renderer
         if (currentBitmap != null) {
             this.renderer.setImageBitmap(currentBitmap, false);
         }
+        // request render again
         requestRender();
 
+        // 4. Return result bitmap
         return result;
     }
 
@@ -411,16 +466,26 @@ public class GPUImage {
         if (filters.isEmpty()) {
             return;
         }
+
+        // 1. Create local renderer
         GPUImageRenderer renderer = new GPUImageRenderer(filters.get(0));
+        // 2. Set bitmap to renderer
         renderer.setImageBitmap(bitmap, false);
+        // 3. Create local pixelBuffer
         PixelBuffer buffer = new PixelBuffer(bitmap.getWidth(), bitmap.getHeight());
+        // 4. Set renderer to pixelBuffer
         buffer.setRenderer(renderer);
 
+        // 5. For each filter
         for (GPUImageFilter filter : filters) {
+            // 5.1. Set filter to local renderer
             renderer.setFilter(filter);
+            // 5.2. Listener get response from bitmap of local pixelBuffer
             listener.response(buffer.getBitmap());
+            // 5.3. Destroy current filter
             filter.destroy();
         }
+        // 6. Delete image from local renderer and delete local pixelBuffer
         renderer.deleteImage();
         buffer.destroy();
     }

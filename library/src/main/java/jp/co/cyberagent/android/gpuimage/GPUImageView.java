@@ -47,16 +47,32 @@ import jp.co.cyberagent.android.gpuimage.util.Rotation;
 import static jp.co.cyberagent.android.gpuimage.GPUImage.SURFACE_TYPE_SURFACE_VIEW;
 import static jp.co.cyberagent.android.gpuimage.GPUImage.SURFACE_TYPE_TEXTURE_VIEW;
 
+/**
+ * Main openGL-based view - extends from FrameLayout - to contain surfaceView
+ * Compose of some components
+ */
 public class GPUImageView extends FrameLayout {
 
+    // 1. Surface type: type of opengl-based view
     private int surfaceType = SURFACE_TYPE_SURFACE_VIEW;
+
+    // 2. SurfaceView - opengl-based view
     private View surfaceView;
+
+    // 3. GPU-Image: main opengl-based processing object + functions
     private GPUImage gpuImage;
+
+    // 4. Loading state of view
     private boolean isShowLoading = true;
+
+    // 5. Current openGL-based filter
     private GPUImageFilter filter;
+
+    // 6. Size and Ratio to display
     public Size forceSize = null;
     private float ratio = 0.0f;
 
+    // 7. Render mode of opengl-based surfaceview: render when there is change or always render
     public final static int RENDERMODE_WHEN_DIRTY = 0;
     public final static int RENDERMODE_CONTINUOUSLY = 1;
 
@@ -71,6 +87,7 @@ public class GPUImageView extends FrameLayout {
     }
 
     private void init(Context context, AttributeSet attrs) {
+        // 1. Init surfaceType + isLoading from view-attribute
         if (attrs != null) {
             TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.GPUImageView, 0, 0);
             try {
@@ -80,19 +97,31 @@ public class GPUImageView extends FrameLayout {
                 a.recycle();
             }
         }
+
+        // 2. Init GPUImage object - main processing logic
         gpuImage = new GPUImage(context);
+
+        // 3. Init surfaceView and set to GPUImage object
+
         if (surfaceType == SURFACE_TYPE_TEXTURE_VIEW) {
+            // 3.1. Type: texture
+            // Init GLTextureView
             surfaceView = new GPUImageGLTextureView(context, attrs);
+            // Add GLTextureView to gpuImage
             gpuImage.setGLTextureView((GLTextureView) surfaceView);
         } else {
+            // 3.2. Type: surface
             surfaceView = new GPUImageGLSurfaceView(context, attrs);
             gpuImage.setGLSurfaceView((GLSurfaceView) surfaceView);
         }
+
+        // 4. Add surfaceView to main-frame view
         addView(surfaceView);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        // Adjust view size based on screen size + ratio
         if (ratio != 0.0f) {
             int width = MeasureSpec.getSize(widthMeasureSpec);
             int height = MeasureSpec.getSize(heightMeasureSpec);
@@ -177,11 +206,13 @@ public class GPUImageView extends FrameLayout {
     }
 
     /**
-     * Set the rendering mode. When renderMode is
-     * RENDERMODE_CONTINUOUSLY, the renderer is called
-     * repeatedly to re-render the scene. When renderMode
-     * is RENDERMODE_WHEN_DIRTY, the renderer only rendered when the surface
-     * is created, or when {@link #requestRender} is called. Defaults to RENDERMODE_CONTINUOUSLY.
+     * Set the rendering mode.
+     * When renderMode is RENDERMODE_CONTINUOUSLY,
+     * the renderer is called repeatedly to re-render the scene.
+     * When renderMode is RENDERMODE_WHEN_DIRTY,
+     * the renderer only rendered when the surface is created,
+     * or when {@link #requestRender} is called.
+     * Defaults to RENDERMODE_CONTINUOUSLY.
      *
      * @param renderMode one of the RENDERMODE_X constants
      * @see #RENDERMODE_CONTINUOUSLY
@@ -451,6 +482,9 @@ public class GPUImageView extends FrameLayout {
         }
     }
 
+    /**
+     * Extend GLSurfaceView with customized size definition
+     */
     private class GPUImageGLSurfaceView extends GLSurfaceView {
         public GPUImageGLSurfaceView(Context context) {
             super(context);
@@ -471,6 +505,9 @@ public class GPUImageView extends FrameLayout {
         }
     }
 
+    /**
+     * Extend GLTextureView with customized size definition
+     */
     private class GPUImageGLTextureView extends GLTextureView {
         public GPUImageGLTextureView(Context context) {
             super(context);

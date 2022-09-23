@@ -27,7 +27,13 @@ import java.util.LinkedList;
 
 import jp.co.cyberagent.android.gpuimage.util.OpenGlUtils;
 
+/**
+ * Main openGL-based filter logic
+ */
 public class GPUImageFilter {
+    /*
+
+     */
     public static final String NO_FILTER_VERTEX_SHADER = "" +
             "attribute vec4 position;\n" +
             "attribute vec4 inputTextureCoordinate;\n" +
@@ -39,6 +45,9 @@ public class GPUImageFilter {
             "    gl_Position = position;\n" +
             "    textureCoordinate = inputTextureCoordinate.xy;\n" +
             "}";
+    /*
+
+     */
     public static final String NO_FILTER_FRAGMENT_SHADER = "" +
             "varying highp vec2 textureCoordinate;\n" +
             " \n" +
@@ -49,15 +58,22 @@ public class GPUImageFilter {
             "     gl_FragColor = texture2D(inputImageTexture, textureCoordinate);\n" +
             "}";
 
+
     private final LinkedList<Runnable> runOnDraw;
     private final String vertexShader;
     private final String fragmentShader;
+
     private int glProgId;
+
     private int glAttribPosition;
+
     private int glUniformTexture;
+
     private int glAttribTextureCoordinate;
+
     private int outputWidth;
     private int outputHeight;
+
     private boolean isInitialized;
 
     public GPUImageFilter() {
@@ -115,16 +131,19 @@ public class GPUImageFilter {
         cubeBuffer.position(0);
         GLES20.glVertexAttribPointer(glAttribPosition, 2, GLES20.GL_FLOAT, false, 0, cubeBuffer);
         GLES20.glEnableVertexAttribArray(glAttribPosition);
+
         textureBuffer.position(0);
         GLES20.glVertexAttribPointer(glAttribTextureCoordinate, 2, GLES20.GL_FLOAT, false, 0,
                 textureBuffer);
         GLES20.glEnableVertexAttribArray(glAttribTextureCoordinate);
+
         if (textureId != OpenGlUtils.NO_TEXTURE) {
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
             GLES20.glUniform1i(glUniformTexture, 0);
         }
         onDrawArraysPre();
+
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
         GLES20.glDisableVertexAttribArray(glAttribPosition);
         GLES20.glDisableVertexAttribArray(glAttribTextureCoordinate);
